@@ -7,7 +7,7 @@ import numpy as np
 import mixem
 from keras.models import Sequential
 from keras.preprocessing.image import ImageDataGenerator
-from keras.layers import LSTM, Dense, Flatten
+from keras.layers import LSTM, Dense, Flatten, Conv2DTranspose, Conv2D, MaxPooling2D, TimeDistributed
 import glob
 import cv2
 
@@ -17,18 +17,20 @@ import cv2
 # Output_Image: (385, 389, 3)
 # Output Data
 
-# Data Import
-images_forged = [cv2.imread(file) for file in glob.glob("COVERAGE/Forged_Images/*.tif")]
-images_pristine = [cv2.imread(file) for file in glob.glob("COVERAGE/Pristine_Images/*.tif")]
+train_datagen = ImageDataGenerator()
 
-forged_output = []
-pristine_output = []
-for i in range(len(images_forged)):
-    one = np.ones((1,1))
-    forged_output.append(one)
-    zero = np.zeros((1,1))
-    pristine_output.append(zero)
+training_X = train_datagen.flow_from_directory('../COVERAGE/Forged_Im',
+                                                 target_size = (374, 324),
+                                                 batch_size = 4,
+                                                 class_mode = None)
 
+training_Y = train_datagen.flow_from_directory('../COVERAGE/Forged_Im_M',
+                                            target_size = (),
+                                            batch_size = 4,
+                                            class_mode = None)
+dataset = zip(training_X, training_Y)
+
+print('Dataset Prepared')
 # im = Image.open('example_p.tif')
 # print(im.size)
 # plt.imshow(im)
@@ -62,31 +64,23 @@ for i in range(len(images_forged)):
 #     mixem.distribution.MultivariateNormalDistribution(np.array((6, 110)), np.identity(3)),
 # ])
 
-images_forged = np.asarray(images_forged)
-print(images_forged.shape)
-images_pristine = np.asarray(images_pristine)
-print(images_pristine.shape)
-forged_output = np.asarray(forged_output)
-print(forged_output.shape)
-pristine_output = np.asarray(pristine_output)
-print(pristine_output.shape)
-
 # Stacked LSTM
 model = Sequential()
-model.add(LSTM(64,activation='tanh',return_sequences=True, input_shape=(images_forged[0].shape[0]*images_forged[0].shape[1], images_forged[0].shape[2])))
+model.add(TimeDistributed(Conv2D(30,kernel_size = (5,5),
+    strides=(1,1),padding='valid',activation='relu'), input_shape=(374, 324, 3)))
+model.add(LSTM(64,activation='tanh',return_sequences=True))
 model.add(LSTM(64,return_sequences=True, activation='tanh'))
 model.add(LSTM(64, activation='tanh'))
-model.add(Dense(1, activation='sigmoid'))
-model.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics=['accuracy'])
 
+model.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics=['accuracy'])
 model.summary()
 
-# Training on Forged
-for i in range(len(images_forged)):
-    images_forged[i] = images_forged[i].reshape(images_forged[i].shape[0]*images_forged[i].shape[1], images_forged[i].shape[2])
-    images_forged[i] = np.reshape(images_forged[i], (1, images_forged[i].shape[0], images_forged[i].shape[1]))
-    model.fit(images_forged[i], forged_output[i], epochs=10, verbose=1)
-    images_pristine[i] = images_pristine[i].reshape(images_pristine[i].shape[0]*images_pristine[i].shape[1], images_pristine[i].shape[2])
-    images_pristine[i] = np.reshape(images_pristine[i], (1, images_pristine[i].shape[0], images_pristine[i].shape[1]))
-    model.fit(images_pristine[i], pristine_output[i], epochs=10, verbose=1)
-model.save('model.h5')
+# # Training on Forged
+# for i in range(len(images_forged)):
+#     images_forged[i] = images_forged[i].reshape(images_forged[i].shape[0]*images_forged[i].shape[1], images_forged[i].shape[2])
+#     images_forged[i] = np.reshape(images_forged[i], (1, images_forged[i].shape[0], images_forged[i].shape[1]))
+#     model.fit(images_forged[i], forged_output[i], epochs=10, verbose=1)
+#     images_pristine[i] = images_pristine[i].reshape(images_pristine[i].shape[0]*images_pristine[i].shape[1], images_pristine[i].shape[2])
+#     images_pristine[i] = np.reshape(images_pristine[i], (1, images_pristine[i].shape[0], images_pristine[i].shape[1]))
+#     model.fit(images_pristine[i], pristine_output[i], epochs=10, verbose=1)
+# model.save('model.h5')

@@ -5,7 +5,7 @@ from keras.models import Sequential
 from keras.layers import Dense, Dropout, Flatten
 from keras.layers import Conv2D, MaxPooling2D, ZeroPadding2D, Conv2DTranspose, UpSampling2D
 from keras.regularizers import l2
-from keras.layers.normalization import BatchNormalization
+from keras.layers.normalization import BatchNormalization as BN
 import keras
 from keras.preprocessing.image import ImageDataGenerator
 from keras.callbacks import ModelCheckpoint
@@ -13,6 +13,7 @@ from keras.regularizers import l2
 import cv2
 import glob
 import numpy as np
+from keras.optimizers import SGD
 
 # Import Images
 # Forged Images
@@ -29,25 +30,32 @@ import numpy as np
 # print(masks_reshaped[0].shape)
 
 # print('Data loaded.')
-
+opt = SGD(lr=0.005, momentum=0.9)
 def Mask_Gen():
     model = Sequential()
     model.add(Conv2D(30,kernel_size = (5,5),
         strides=(1,1),padding='valid',activation='relu',input_shape=(374, 324, 3)))
+    model.add(BN())
     model.add(Conv2D(30,kernel_size=(5,5),
         strides=1,activation='relu'))
+    model.add(BN())
     model.add(MaxPooling2D(pool_size=(2,2),strides=(2,2),padding='valid'))
     model.add(Conv2D(16,kernel_size=(3,3),
         strides=1,activation='relu'))
+    model.add(BN())
     model.add(Conv2D(16,kernel_size=(3,3),
         strides=1,activation='relu'))
+    model.add(BN())
     model.add(MaxPooling2D(pool_size=(2,2),strides=(2,2),padding='valid'))
     model.add(Conv2D(16,kernel_size=(3,3),
         strides=1,activation='relu'))
+    model.add(BN())
     model.add(Conv2D(16,kernel_size=(3,3),
         strides=1,activation='relu'))
+    model.add(BN())
     model.add(Conv2D(16,kernel_size=(3,3),
         strides=1,activation='relu'))
+    model.add(BN())
     model.add(Conv2D(16,kernel_size=(3,3),
         strides=1,activation='relu'))
     model.add(Dropout(0.5))
@@ -76,6 +84,8 @@ classifier = Mask_Gen()
 
 # classifier.fit(forged_images, masks_reshaped, epochs=1, verbose=1)
 # model.save('model.h5')
+checkpoint = ModelCheckpoint('model_1.h5', monitor='acc', verbose=1, save_best_only=True, mode='max')
+callbacks_list = [checkpoint]
 
 train_datagen = ImageDataGenerator()
 
@@ -90,18 +100,5 @@ training_Y = train_datagen.flow_from_directory('../COVERAGE/Forged_Im_M',
                                             class_mode = None)
 dataset = zip(training_X, training_Y)
 
-classifier.fit_generator(dataset, steps_per_epoch=100,epochs=20 verbose=1)
+classifier.fit_generator(dataset, steps_per_epoch=100,epochs=100, verbose=1, callbacks=callbacks_list)
 classifier.save_weights("model_masks.h5")
-
-# # Prediction for the example
-from PIL import Image
-import numpy as np
-
-classifier.load_weights("model_masks.h5")
-
-img  = Image.open('example_p.tif')
-img = cv2.resize(cv2.UMAT(img), dsize=(324, 374), interpolation=cv2.INTER_CUBIC)
-
-x = np.expand_dims(img, axis=0)
-
-res = classifier.predict(x)
