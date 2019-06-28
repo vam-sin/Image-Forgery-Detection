@@ -55,9 +55,10 @@ def Mask_Gen():
     model.add(UpSampling2D(size=(2,2)))
     model.add(Conv2DTranspose(16, kernel_size=(3,3),
         strides=1, activation='relu'))
-    model.add(Conv2DTranspose(3, kernel_size=(3,3),
+    model.add(Conv2DTranspose(1, kernel_size=(3,3),
         strides=1, activation='relu'))
     model.add(UpSampling2D(size=(2,2)))
+
     model.compile(loss='mse',
         optimizer='adam',
         metrics=['accuracy'])
@@ -67,9 +68,7 @@ def Mask_Gen():
 
 classifier = Mask_Gen()
 
-# classifier.fit(forged_images, masks_reshaped, epochs=1, verbose=1)
-# model.save('model.h5')
-checkpoint = ModelCheckpoint('model_1.h5', monitor='acc', verbose=1, save_best_only=True, mode='max')
+checkpoint = ModelCheckpoint('model_cnn.h5', monitor='acc', verbose=1, save_best_only=True, mode='max')
 callbacks_list = [checkpoint]
 
 train_datagen = ImageDataGenerator()
@@ -82,9 +81,10 @@ training_X = train_datagen.flow_from_directory('../COVERAGE/Forged_Im',
 training_Y = train_datagen.flow_from_directory('../COVERAGE/Forged_Im_M',
                                             target_size = (364, 316),
                                             batch_size = 4,
+                                            color_mode='grayscale',
                                             class_mode = None, shuffle=False)
 dataset = zip(training_X, training_Y)
 print('Data loaded.')
 
-classifier.fit_generator(dataset, steps_per_epoch=100,epochs=100, verbose=1, callbacks=callbacks_list)
-classifier.save_weights("model_masks.h5")
+classifier.fit_generator(dataset, steps_per_epoch=100,epochs=20, verbose=1, callbacks=callbacks_list)
+classifier.save_weights("model_cnn.h5")
