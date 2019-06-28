@@ -15,21 +15,6 @@ import glob
 import numpy as np
 from keras.optimizers import SGD
 
-# Import Images
-# Forged Images
-# forged_images = [cv2.imread(file) for file in glob.glob("../COVERAGE/Forged_Images/*.tif")]
-# # forged_images = np.asarray(forged_images)
-# # Masks
-# masks = [cv2.imread(file) for file in glob.glob("../COVERAGE/Forged_Images_Masks/*.tif")]
-# masks_reshaped = []
-# for m in masks:
-#     m_res = cv2.resize(m, dsize=(316, 364), interpolation=cv2.INTER_CUBIC)
-#     masks_reshaped.append(m_res)
-# # masks_reshaped = np.asarray(masks_reshaped)
-# print(forged_images[0].shape)
-# print(masks_reshaped[0].shape)
-
-# print('Data loaded.')
 opt = SGD(lr=0.005, momentum=0.9)
 def Mask_Gen():
     model = Sequential()
@@ -92,13 +77,14 @@ train_datagen = ImageDataGenerator()
 training_X = train_datagen.flow_from_directory('../COVERAGE/Forged_Im',
                                                  target_size = (374, 324),
                                                  batch_size = 4,
-                                                 class_mode = None)
+                                                 class_mode = None, shuffle=False)
 
 training_Y = train_datagen.flow_from_directory('../COVERAGE/Forged_Im_M',
                                             target_size = (364, 316),
                                             batch_size = 4,
-                                            class_mode = None)
+                                            class_mode = None, shuffle=False)
 dataset = zip(training_X, training_Y)
+print('Data loaded.')
 
 classifier.fit_generator(dataset, steps_per_epoch=100,epochs=100, verbose=1, callbacks=callbacks_list)
 classifier.save_weights("model_masks.h5")
