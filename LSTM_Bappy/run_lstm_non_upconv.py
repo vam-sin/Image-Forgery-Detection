@@ -46,28 +46,8 @@ def LSTM_Model():
     model.add(Reshape((1,672)))
     model.add(LSTM(64, activation='tanh', return_sequences=True))
     model.add(LSTM(64, activation='tanh', return_sequences=True))
-    model.add(LSTM(64*3, activation='tanh', return_sequences=True))
-    model.add(Reshape((8,8,3)))
-    model.add(Conv2DTranspose(16, kernel_size=(3,3),
-        strides=1, activation='relu'))
-    model.add(Conv2DTranspose(16, kernel_size=(3,3),
-        strides=1, activation='relu'))
-    model.add(UpSampling2D(size=(2,2)))
-    model.add(Conv2DTranspose(16, kernel_size=(3,3),
-        strides=1, activation='relu'))
-    model.add(Conv2DTranspose(16, kernel_size=(3,3),
-        strides=1, activation='relu'))
-    model.add(UpSampling2D(size=(2,2)))
-    model.add(Conv2DTranspose(16, kernel_size=(3,3),
-        strides=1, activation='relu'))
-    model.add(Conv2DTranspose(16, kernel_size=(3,3),
-        strides=1, activation='relu'))
-    model.add(UpSampling2D(size=(2,2)))
-    model.add(Conv2DTranspose(16, kernel_size=(3,3),
-        strides=1, activation='relu'))
-    model.add(Conv2DTranspose(1, kernel_size=(3,3),
-        strides=1, activation='relu'))
-    model.add(UpSampling2D(size=(2,2)))
+    model.add(LSTM(64, activation='tanh', return_sequences=True))
+    model.add(Reshape((8,8,1)))
     model.compile(optimizer = opt, loss = 'mse', metrics=['accuracy'])
     #model.summary()
 
@@ -75,7 +55,7 @@ def LSTM_Model():
 
 
 classifier = LSTM_Model()
-classifier.load_weights("model_lstm.h5")
+classifier.load_weights("model_lstm_non_upconv.h5")
 print('Loaded Weights')
 
 # Predictions

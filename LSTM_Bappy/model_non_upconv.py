@@ -27,7 +27,7 @@ training_X = train_datagen.flow_from_directory('../COVERAGE/Forged_Im',
                                                  subset='training')
 
 training_Y = train_datagen.flow_from_directory('../COVERAGE/Forged_Im_M',
-                                            target_size = (248, 248),
+                                            target_size = (8, 8),
                                             batch_size = 1,
                                             color_mode='grayscale',
                                             class_mode = None, shuffle=False,
@@ -85,36 +85,16 @@ def LSTM_Model():
     model.add(Reshape((1,672)))
     model.add(LSTM(64, activation='tanh', return_sequences=True))
     model.add(LSTM(64, activation='tanh', return_sequences=True))
-    model.add(LSTM(64*3, activation='tanh', return_sequences=True))
-    model.add(Reshape((8,8,3)))
-    model.add(Conv2DTranspose(16, kernel_size=(3,3),
-        strides=1, activation='relu'))
-    model.add(Conv2DTranspose(16, kernel_size=(3,3),
-        strides=1, activation='relu'))
-    model.add(UpSampling2D(size=(2,2)))
-    model.add(Conv2DTranspose(16, kernel_size=(3,3),
-        strides=1, activation='relu'))
-    model.add(Conv2DTranspose(16, kernel_size=(3,3),
-        strides=1, activation='relu'))
-    model.add(UpSampling2D(size=(2,2)))
-    model.add(Conv2DTranspose(16, kernel_size=(3,3),
-        strides=1, activation='relu'))
-    model.add(Conv2DTranspose(16, kernel_size=(3,3),
-        strides=1, activation='relu'))
-    model.add(UpSampling2D(size=(2,2)))
-    model.add(Conv2DTranspose(16, kernel_size=(3,3),
-        strides=1, activation='relu'))
-    model.add(Conv2DTranspose(1, kernel_size=(3,3),
-        strides=1, activation='relu'))
-    model.add(UpSampling2D(size=(2,2)))
+    model.add(LSTM(64, activation='tanh', return_sequences=True))
+    model.add(Reshape((8,8,1)))
     model.compile(optimizer = opt, loss = 'mse', metrics=['accuracy'])
     model.summary()
 
     return model
 
-# classifier = LSTM_Model()
+classifier = LSTM_Model()
 
 checkpoint = ModelCheckpoint('model_lstm.h5', monitor='acc', verbose=1, save_best_only=True, mode='max')
 callbacks_list = [checkpoint]
 
-# classifier.fit_generator(dataset, steps_per_epoch=100, epochs=50, verbose=1, callbacks=callbacks_list)
+classifier.fit_generator(dataset, steps_per_epoch=100, epochs=50, verbose=1, callbacks=callbacks_list)

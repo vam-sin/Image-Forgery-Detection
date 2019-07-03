@@ -38,25 +38,10 @@ def Mask_Gen():
     model.add(BN())
     model.add(Conv2D(16,kernel_size=(3,3),
         strides=1,activation='relu'))
-    model.add(BN())
-    model.add(Conv2D(16,kernel_size=(3,3),
-        strides=1,activation='relu'))
     model.add(Dropout(0.5))
-    model.add(Conv2DTranspose(16, kernel_size=(3,3),
-        strides=1, activation='relu'))
-    model.add(Conv2DTranspose(16, kernel_size=(3,3),
-        strides=1, activation='relu'))
-    model.add(Conv2DTranspose(16, kernel_size=(3,3),
-        strides=1, activation='relu'))
-    model.add(Conv2DTranspose(16, kernel_size=(3,3),
-        strides=1, activation='relu'))
-    model.add(UpSampling2D(size=(2,2)))
-    model.add(Conv2DTranspose(16, kernel_size=(3,3),
-        strides=1, activation='relu'))
-    model.add(Conv2DTranspose(1, kernel_size=(3,3),
-        strides=1, activation='relu'))
-    model.add(UpSampling2D(size=(2,2)))
-
+    model.add(BN())
+    model.add(Conv2D(1,kernel_size=(3,3),
+        strides=1,activation='relu'))
     model.compile(loss='mse',
         optimizer='adam',
         metrics=['accuracy'])
@@ -82,7 +67,7 @@ training_X = train_datagen.flow_from_directory('../COVERAGE/Forged_Im',
                                                  class_mode = None, shuffle=False)
 
 training_Y = train_datagen.flow_from_directory('../COVERAGE/Forged_Im_M',
-                                            target_size = (364, 316),
+                                            target_size = (81, 69),
                                             batch_size = 8,
                                             color_mode='grayscale',
                                             class_mode = None, shuffle=False)

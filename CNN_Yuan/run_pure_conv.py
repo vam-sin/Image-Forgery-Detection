@@ -35,29 +35,14 @@ def Mask_Gen():
     model.add(BN())
     model.add(Conv2D(16,kernel_size=(3,3),
         strides=1,activation='relu'))
-    model.add(BN())
-    model.add(Conv2D(16,kernel_size=(3,3),
-        strides=1,activation='relu'))
     model.add(Dropout(0.5))
-    model.add(Conv2DTranspose(16, kernel_size=(3,3),
-        strides=1, activation='relu'))
-    model.add(Conv2DTranspose(16, kernel_size=(3,3),
-        strides=1, activation='relu'))
-    model.add(Conv2DTranspose(16, kernel_size=(3,3),
-        strides=1, activation='relu'))
-    model.add(Conv2DTranspose(16, kernel_size=(3,3),
-        strides=1, activation='relu'))
-    model.add(UpSampling2D(size=(2,2)))
-    model.add(Conv2DTranspose(16, kernel_size=(3,3),
-        strides=1, activation='relu'))
-    model.add(Conv2DTranspose(1, kernel_size=(3,3),
-        strides=1, activation='relu'))
-    model.add(UpSampling2D(size=(2,2)))
-
+    model.add(BN())
+    model.add(Conv2D(1,kernel_size=(3,3),
+        strides=1,activation='relu'))
     model.compile(loss='mse',
         optimizer='adam',
         metrics=['accuracy'])
-    #model.summary()
+    model.summary()
 
     return model
 
