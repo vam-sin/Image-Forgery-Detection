@@ -47,12 +47,14 @@ def Mask_Gen():
     return model
 
 classifier = Mask_Gen()
-classifier.load_weights("model_cnn.h5")
+classifier.load_weights("model_pure_cnn.h5")
 print('Loaded Weights')
 
 # Prediction for the example
 img  = Image.open('6t.tif')
 img = cv2.resize(np.float32(img), dsize=(324, 374), interpolation=cv2.INTER_CUBIC)
+# If only one channel
+# img = cv2.merge((img,img,img))
 print(img.shape)
 x = np.expand_dims(img, axis=0)
 print(x.shape)
