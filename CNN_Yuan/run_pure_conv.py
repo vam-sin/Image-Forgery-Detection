@@ -42,7 +42,7 @@ def Mask_Gen():
     model.compile(loss='mse',
         optimizer='adam',
         metrics=['accuracy'])
-    model.summary()
+    # model.summary()
 
     return model
 
@@ -55,23 +55,31 @@ img  = Image.open('dataset/original/four_orig.jpeg')
 img = cv2.resize(np.float32(img), dsize=(324, 374), interpolation=cv2.INTER_CUBIC)
 # If only one channel
 img = cv2.merge((img,img,img))
-print(img.shape)
+# print(img.shape)
 x = np.expand_dims(img, axis=0)
-print(x.shape)
+# print(x.shape)
 
 x = np.expand_dims(img, axis=0)
 
 res = classifier.predict(x)
-print(res.shape)
+# print(res.shape)
 res = np.squeeze(res, axis=0)
 res = np.squeeze(res, axis=-1)
-print(res.shape)
+# print(res.shape)
 # res = cv2.GaussianBlur(res, (11, 11), 0)
 # res = cv2.threshold(res, 5, 255, cv2.THRESH_BINARY)[1]
 # 16,17 for four/one. 17,18 for three/two.
-lower_red = np.array([16])
-upper_red = np.array([17])
-# print(res[33,51])
+
+# the area of the image with the largest intensity value
+(minVal, maxVal, minLoc, maxLoc) = cv2.minMaxLoc(res)
+# print(maxLoc)
+x = maxLoc[0]
+y = maxLoc[1]
+val = int(res[y,x])
+print("Threshold Pixel Value " + str(val))
+lower_red = np.array([val])
+upper_red = np.array([val+1])
+# print(res[44,32])
 res = cv2.inRange(res, lower_red, upper_red)
 labels = {1:'Forged',2:'Pristine'}
 plt.imshow(res.astype('uint8'))
@@ -80,9 +88,6 @@ cbar.ax.set_yticklabels(['Pristine','','','','','Forged'])
 cbar.set_label('Forgery Index')
 plt.show()
 
-# the area of the image with the largest intensity value
-(minVal, maxVal, minLoc, maxLoc) = cv2.minMaxLoc(res)
-print(maxLoc)
 x_max = maxLoc[0] + 10
 x_min = maxLoc[0] - 10
 y_max = maxLoc[1] + 10
