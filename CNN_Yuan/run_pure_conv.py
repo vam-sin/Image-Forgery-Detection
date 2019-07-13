@@ -47,11 +47,11 @@ def Mask_Gen():
     return model
 
 classifier = Mask_Gen()
-classifier.load_weights("model_pure_cnn.h5")
+classifier.load_weights("model_pure_cnn_dice.h5")
 print('Loaded Weights')
 
 # Prediction for the example
-img  = Image.open('dataset/original/four.jpeg')
+img  = Image.open('dataset/original/three.jpeg')
 img = cv2.resize(np.float32(img), dsize=(324, 374), interpolation=cv2.INTER_CUBIC)
 # If only one channel
 img = cv2.merge((img,img,img))
@@ -69,7 +69,7 @@ print(res.shape)
 labels = {1:'Forged',2:'Pristine'}
 plt.imshow(res.astype('uint8'))
 cbar = plt.colorbar()
-cbar.ax.set_yticklabels(['Pristine','','','','','','','Forged'])
+cbar.ax.set_yticklabels(['Pristine','','','','','Forged'])
 cbar.set_label('Forgery Index')
 plt.show()
 
@@ -81,7 +81,7 @@ x_min = maxLoc[0] - 10
 y_max = maxLoc[1] + 10
 y_min = maxLoc[1] - 10
 # print(x_max)
-object = cv2.imread('dataset/original/four.jpeg')
+object = cv2.imread('dataset/original/three.jpeg')
 # cv2.imshow('Orig', object)
 object = cv2.resize(object, dsize=(81, 69), interpolation=cv2.INTER_CUBIC)
 # cv2.imshow('Resize', object)
@@ -89,5 +89,6 @@ cv2.rectangle(object,(int(x_min),int(y_min)),(int(x_max),int(y_max)),(0,255,0),3
 # object = cv2.resize(np.float32(object), dsize=(81, 69), interpolation=cv2.INTER_CUBIC)
 
 cv2.imshow('Box',object)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+# cv2.waitKey(0)
+# cv2.destroyAllWindows()
+cv2.imwrite('Results/Dice/three_bound_box_dice.png',object)

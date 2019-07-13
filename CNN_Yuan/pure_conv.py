@@ -80,7 +80,7 @@ def Mask_Gen():
     model.add(Conv2D(1,kernel_size=(3,3),
         strides=1,activation='relu'))
     # model.add(Reshape((81,69)))
-    model.compile(loss='mse',
+    model.compile(loss=dice_coef,
         optimizer='adam',
         metrics=['accuracy'])
     model.summary()
@@ -89,7 +89,7 @@ def Mask_Gen():
 
 classifier = Mask_Gen()
 
-checkpoint = ModelCheckpoint('model_pure_cnn_mse.h5', monitor='acc', verbose=1, save_best_only=True, mode='max')
+checkpoint = ModelCheckpoint('model_pure_cnn_dice.h5', monitor='acc', verbose=1, save_best_only=True, mode='max')
 callbacks_list = [checkpoint]
 
 train_datagen = ImageDataGenerator(shear_range=0.2,
@@ -130,4 +130,4 @@ dataset = zip(training_X, training_Y)
 # print('Data loaded.')
 # # Checking the dataset
 classifier.fit_generator(dataset, steps_per_epoch=100,epochs=20, verbose=1, callbacks=callbacks_list)
-classifier.save_weights("model_pure_cnn_mse.h5")
+classifier.save_weights("model_pure_cnn_dice.h5")
