@@ -25,5 +25,5 @@ python3 /src/CNN/cnn.py
 To train the LSTM model, run the following command.
 
 ```python3
-python3 /src/CNN/run_lstm.py
+python3 /src/LSTM/run_lstm.py
 ```
